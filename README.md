@@ -1,6 +1,6 @@
 # odoo-hackathon-2026
 
 Team Members:
-Simon
+Simon Pathre
 Asher
 Gauri

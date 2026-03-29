@@ -16,23 +16,51 @@ export default function LoginPage() {
   const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email || !password || !selectedRole) return
-    setIsLoading(true)
+  e.preventDefault()
 
-    setTimeout(() => {
-      sessionStorage.setItem('userEmail', email)
-      sessionStorage.setItem('userRole', selectedRole)
-      
-      const routes: Record<string, string> = {
-        admin: '/admin',
-        manager: '/manager',
-        employee: '/employee'
-      }
-      
-      router.push(routes[selectedRole])
-    }, 600)
+  if (!email || !password) return
+
+  setIsLoading(true)
+
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      alert(data.message)
+      setIsLoading(false)
+      return
+    }
+
+    // ✅ STORE USER DATA
+    sessionStorage.setItem("userEmail", data.user.email)
+    sessionStorage.setItem("userRole", data.user.role)
+
+    // ✅ REDIRECT BASED ON ROLE
+    const routes: Record<string, string> = {
+      admin: "/admin",
+      manager: "/manager",
+      employee: "/employee"
+    }
+
+    router.push(routes[data.user.role])
+
+  } catch (err) {
+    alert("Login failed")
   }
+
+  setIsLoading(false)
+}
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">

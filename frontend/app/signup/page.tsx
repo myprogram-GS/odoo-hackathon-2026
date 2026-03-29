@@ -28,22 +28,53 @@ export default function SignupPage() {
   }
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+  e.preventDefault()
+  setError("")
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
+  if (formData.password !== formData.confirmPassword) {
+    setError("Passwords do not match")
+    return
+  }
+
+  setIsLoading(true)
+
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        fullName: formData.name,
+        email: formData.email,
+        password: formData.password,
+        companyName: formData.company,
+        country: formData.country,
+        role: "admin"
+      })
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      setError(data.message)
+      setIsLoading(false)
       return
     }
 
-    setIsLoading(true)
+    // ✅ SAVE SESSION
+    sessionStorage.setItem("userEmail", data.user.email)
+    sessionStorage.setItem("userRole", data.user.role)
 
-    setTimeout(() => {
-      sessionStorage.setItem('userEmail', formData.email)
-      sessionStorage.setItem('userRole', 'admin')
-      router.push('/dashboard/admin')
-    }, 600)
+    // ✅ REDIRECT
+    router.push("/admin")
+
+  } catch (err) {
+    setError("Signup failed")
   }
+
+  setIsLoading(false)
+}
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">

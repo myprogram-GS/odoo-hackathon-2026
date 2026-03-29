@@ -1,14 +1,14 @@
 # 🚀 ReimbursePlus – Expense Management System
 
-A full-stack expense management system built using **React + Node.js + Express + MongoDB**.
+A full-stack expense management system built using **React + Next.js + Node.js + Express + MongoDB**.
 
 ---
 
 ## 👥 Team Members
 
-* Simon
-* Asher
-* Gauri
+* Simon Pathre
+* Asher Carneiro
+* Gauri Salvi
 
 ---
 

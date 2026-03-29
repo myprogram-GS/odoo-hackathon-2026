@@ -28,21 +28,21 @@ export default function SignupPage() {
   }
 
   const handleSignup = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setError("")
+  e.preventDefault();
+  setError("");
 
   if (formData.password !== formData.confirmPassword) {
-    setError("Passwords do not match")
-    return
+    setError("Passwords do not match");
+    return;
   }
 
-  setIsLoading(true)
+  setIsLoading(true);
 
   try {
     const res = await fetch("http://localhost:5000/api/auth/signup", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         fullName: formData.name,
@@ -50,31 +50,34 @@ export default function SignupPage() {
         password: formData.password,
         companyName: formData.company,
         country: formData.country,
-        role: "admin"
-      })
-    })
+        role: formData.role, // ✅ FIX
+      }),
+    });
 
-    const data = await res.json()
+    const data = await res.json();
 
     if (!res.ok) {
-      setError(data.message)
-      setIsLoading(false)
-      return
+      setError(data.message);
+      return;
     }
 
-    // ✅ SAVE SESSION
-    sessionStorage.setItem("userEmail", data.user.email)
-    sessionStorage.setItem("userRole", data.user.role)
+    sessionStorage.setItem("userEmail", data.user.email);
+    sessionStorage.setItem("userRole", data.user.role);
 
-    // ✅ REDIRECT
-    router.push("/admin")
+    // ✅ REDIRECT BASED ON ROLE
+    const routes: any = {
+      admin: "/admin",
+      manager: "/manager",
+      employee: "/employee",
+    };
 
+    router.push(routes[data.user.role]);
   } catch (err) {
-    setError("Signup failed")
+    setError("Signup failed");
   }
 
-  setIsLoading(false)
-}
+  setIsLoading(false);
+};
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
@@ -148,17 +151,14 @@ export default function SignupPage() {
             <div className="space-y-2">
               <label className="block text-white/80 text-sm font-medium">Country</label>
               <select
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-                className="glass-input border-white/10 text-white bg-white/5 w-full"
-              >
-                <option value="US" className="bg-slate-900">US</option>
-                <option value="UK" className="bg-slate-900">UK</option>
-                <option value="CA" className="bg-slate-900">CA</option>
-                <option value="AU" className="bg-slate-900">AU</option>
-                <option value="DE" className="bg-slate-900">DE</option>
-                <option value="FR" className="bg-slate-900">FR</option>
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="glass-input w-full"
+                >
+                  <option value="admin">Admin</option>
+                  <option value="manager">Manager</option>
+                  <option value="employee">Employee</option>
               </select>
             </div>
 

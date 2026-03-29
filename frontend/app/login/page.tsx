@@ -15,52 +15,47 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
 
-  const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault()
+ const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-  if (!email || !password) return
-
-  setIsLoading(true)
+  setIsLoading(true);
 
   try {
     const res = await fetch("http://localhost:5000/api/auth/login", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         email,
-        password
-      })
-    })
+        password,
+        role: selectedRole, // ✅ IMPORTANT
+      }),
+    });
 
-    const data = await res.json()
+    const data = await res.json();
 
     if (!res.ok) {
-      alert(data.message)
-      setIsLoading(false)
-      return
+      alert(data.message);
+      return;
     }
 
-    // ✅ STORE USER DATA
-    sessionStorage.setItem("userEmail", data.user.email)
-    sessionStorage.setItem("userRole", data.user.role)
+    sessionStorage.setItem("userEmail", data.user.email);
+    sessionStorage.setItem("userRole", data.user.role);
 
-    // ✅ REDIRECT BASED ON ROLE
-    const routes: Record<string, string> = {
+    const routes: any = {
       admin: "/admin",
       manager: "/manager",
-      employee: "/employee"
-    }
+      employee: "/employee",
+    };
 
-    router.push(routes[data.user.role])
-
+    router.push(routes[data.user.role]);
   } catch (err) {
-    alert("Login failed")
+    alert("Login failed");
   }
 
-  setIsLoading(false)
-}
+  setIsLoading(false);
+};
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
